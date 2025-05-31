@@ -1,0 +1,12 @@
+- Score Element:
+	- Position
+	- Zeitpunkt
+	- Score
+	- Game
+
+- 1. Scene Map: Pins an Positionen von Scores
+- 2. Scene List mit Scores
+- 3. Game Scene
+- 4. Create Challange
+	- Price
+	- (Win)
