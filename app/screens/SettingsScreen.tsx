@@ -3,7 +3,7 @@ import { StyleSheet, Text, SafeAreaView, ActivityIndicator } from 'react-native'
 const SettingsScreen = () => {
   return (
 	<SafeAreaView style={styles.container}>
-	  <Text style={styles.title}>Settings</Text>
+	  <Text style={styles.title}>Soon...</Text>
 	</SafeAreaView>
   );
 }

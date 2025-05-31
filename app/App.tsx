@@ -2,11 +2,8 @@ import React from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-// import { WalletConnectProvider } from '@walletconnect/react-native-dapp'
-
-// Your screens
 import MapScreen from './screens/MapScreen'
-import PersonalEventsScreen from './screens/PersonalEventsScreen'
+import UserScreen from './screens/UserScreen'
 import SettingsScreen from './screens/SettingsScreen'
 
 const Tab = createBottomTabNavigator()
@@ -29,7 +26,7 @@ export default function App() {
 				})}
 			>
 				<Tab.Screen name="Map" component={MapScreen} />
-				<Tab.Screen name="Personal" component={PersonalEventsScreen} />
+				<Tab.Screen name="Personal" component={UserScreen} />
 				<Tab.Screen name="Settings" component={SettingsScreen} />
 			</Tab.Navigator>
 		</NavigationContainer>
