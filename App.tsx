@@ -1,79 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import { StyleSheet, Text, SafeAreaView, ActivityIndicator } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import MapScreen from './screens/MapScreen';
+import PersonalEventsScreen from './screens/PersonalEventsScreen';
+import SettingsScreen from './screens/SettingsScreen';
 
-type LocationCoords = {
-  latitude: number;
-  longitude: number;
-  altitude?: number | null;
-  accuracy?: number | null;
-  heading?: number | null;
-  speed?: number | null;
-};
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-
-  const [location, setLocation] = useState<LocationCoords | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      // Request permission to access location
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      try {
-        // Get current location
-        const loc = await Location.getCurrentPositionAsync({});
-        setLocation(loc.coords);
-      } catch (error: any) {
-        setErrorMsg('Failed to get location: ' + error.message);
-      }
-    })();
-  }, []);
-
-  if (errorMsg) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text>Error: {errorMsg}</Text>
-      </SafeAreaView>
-    );
-  }
-
-  if (!location) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" />
-        <Text>Fetching location...</Text>
-        <StatusBar style="auto" />
-      </SafeAreaView>
-    );
-  }
-
   return (
-    <SafeAreaView style={styles.container}>
-      <MapView
-        style={styles.map}
-        region={{
-          latitude: location.latitude,
-          longitude: location.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        showsUserLocation={true}
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+
+            switch (route.name) {
+              case 'Map':
+                return <Ionicons name="map-outline" size={size} color={color} />;
+              case 'Personal':
+                return <Ionicons name="person-outline" size={size} color={color} />;
+              case 'Settings':
+                return <Ionicons name="settings-outline" size={size} color={color} />;
+              default:
+                let iconName = route.name === 'Map' ? 'map-outline' : 'person-outline';
+                return <Ionicons name={iconName} size={size} color={color} />;
+            }
+          },
+          tabBarActiveTintColor: 'tomato',
+          tabBarInactiveTintColor: 'gray',
+        })}
       >
-        {/* <Marker coordinate={{ latitude: location.latitude, longitude: location.longitude }} /> */}
-      </MapView>
-    </SafeAreaView>
+        <Tab.Screen name="Map" component={MapScreen} />
+        <Tab.Screen name="Personal" component={PersonalEventsScreen} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 },
-});
