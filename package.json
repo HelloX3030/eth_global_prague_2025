@@ -9,11 +9,15 @@
 		"web": "expo start --web"
 	},
 	"dependencies": {
+		"@react-native-async-storage/async-storage": "^2.1.2",
 		"@react-native-community/geolocation": "^3.4.0",
 		"@react-navigation/bottom-tabs": "^7.3.14",
 		"@react-navigation/native": "^7.1.10",
 		"@supabase/supabase-js": "^2.49.8",
-		"ethers": "^6.14.3",
+		"@walletconnect/core": "^2.21.0",
+		"@walletconnect/react-native-dapp": "^1.8.0",
+		"@walletconnect/web3wallet": "^1.16.1",
+		"ethers": "^5.8.0",
 		"expo": "~53.0.9",
 		"expo-location": "~18.1.5",
 		"expo-status-bar": "~2.2.3",
@@ -27,8 +31,7 @@
 		"react-native-safe-area-context": "^5.4.1",
 		"react-native-screens": "^4.11.1",
 		"react-native-url-polyfill": "^2.0.0",
-		"react-native-vector-icons": "^10.2.0",
-		"@react-native-async-storage/async-storage": "2.1.2"
+		"react-native-vector-icons": "^10.2.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.25.2",
