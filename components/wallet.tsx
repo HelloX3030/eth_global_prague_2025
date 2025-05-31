@@ -1,26 +1,27 @@
-// import { ethers } from 'ethers'
+// wallet.ts
+import { useWalletConnect } from '@walletconnect/react-native-dapp'
+import { ethers } from 'ethers'
 
-// declare global {
-// 	interface Window {
-// 		ethereum?: any;
-// 	}
-// }
+export function useWallet() {
+	const connector = useWalletConnect()
 
-// export async function connectWallet() {
-// 	try {
-// 		if (!window.ethereum) {
-// 			alert("No wallet found")
-// 			return { provider: null, signer: null, address: null }
-// 		}
+	const connectWallet = async () => {
+		if (!connector.connected) {
+			await connector.connect()
+		}
 
-// 		const provider = new ethers.BrowserProvider(window.ethereum)
-// 		await provider.send("eth_requestAccounts", [])
-// 		const signer = await provider.getSigner()
-// 		const address = await signer.getAddress()
-// 		return { provider, signer, address }
-// 	} catch (error) {
-// 		console.error("Error connecting wallet:", error)
-// 		alert("Failed to connect wallet")
-// 		return { provider: null, signer: null, address: null }
-// 	}
-// }
+		const address = connector.accounts[0]
+		const provider = new ethers.providers.Web3Provider(connector as any)
+		const signer = provider.getSigner()
+
+		return { connector, address, provider, signer }
+	}
+
+	const disconnectWallet = async () => {
+		if (connector.connected) {
+			await connector.killSession()
+		}
+	}
+
+	return { connectWallet, disconnectWallet, connector }
+}
