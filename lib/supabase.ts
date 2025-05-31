@@ -1,9 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SupabaseClientOptions } from '@supabase/supabase-js';
+import Constants from 'expo-constants';
 
-const supabaseUrl = 'https://YOUR_PROJECT_ID.supabase.co';
-const supabaseAnonKey = 'YOUR_ANON_KEY';
+
+const { supabaseUrl, supabaseAnonKey } = Constants.expoConfig?.extra || {};
 
 const options: SupabaseClientOptions<'public'> = {
   auth: {
