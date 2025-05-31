@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, SafeAreaView, ActivityIndicator, TouchableOpacity, Modal, View, TextInput } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useRoute } from '@react-navigation/native';
 
 type LocationCoords = {
   latitude: number;
@@ -30,6 +31,23 @@ const MapScreen = () => {
 
   const [location, setLocation] = useState<LocationCoords | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+   const [focusedLocation, setFocusedLocation] = useState<LocationCoords | null>(null);
+
+  interface MapScreenRouteParams {
+    latitude: number;
+    longitude: number;
+  }
+
+  const route = useRoute();
+  useEffect(() => {
+    const params = (route as { params?: MapScreenRouteParams }).params;
+    if (params && params.latitude && params.longitude) {
+      setFocusedLocation({
+        latitude: params.latitude,
+        longitude: params.longitude,
+      });
+    }
+  }, [route]);
 
   const [challenges, setChallenges] = useState<Challenge[]>([
     {
@@ -145,6 +163,8 @@ const MapScreen = () => {
 
   ]);
 
+
+
   const [modalVisible, setModalVisible] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
@@ -220,8 +240,8 @@ const MapScreen = () => {
       <MapView
         style={styles.map}
         region={{
-          latitude: location.latitude,
-          longitude: location.longitude,
+          latitude: focusedLocation?.latitude ?? location.latitude,
+          longitude: focusedLocation?.longitude ?? location.longitude,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}

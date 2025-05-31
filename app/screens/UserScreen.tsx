@@ -1,5 +1,7 @@
 import { StyleSheet, Text, SafeAreaView, ActivityIndicator, StatusBar, View, Image, Touchable, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 interface Score {
 	id: number;
@@ -19,7 +21,15 @@ interface User {
 	scores: Score[];
 }
 
+type RootTabParamList = {
+  Map: { latitude: number; longitude: number; scoreId: number };
+  Personal: undefined;
+  Settings: undefined;
+};
+
 const UserScreen = () => {
+
+	const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
 
 	const [user, setUser] = useState<User | null>({
 		id: '1',
@@ -128,7 +138,11 @@ const UserScreen = () => {
 				<View style={styles.userScores}>
 					<Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Scores:</Text>
 					{user.scores.map((score) => (
-						<TouchableOpacity key={score.id} style={styles.scoreItem} onPress={() => alert(`Score ${score.id} pressed`)}>
+						<TouchableOpacity key={score.id} style={styles.scoreItem} onPress={() => navigation.navigate('Map', {
+							latitude: score.latitude,
+							longitude: score.longitude,
+							scoreId: score.id,
+						})}>
 							<Text style={styles.scoreTitle}>{score.title}</Text>
 							<Text style={styles.scoreDescription}>{score.description}</Text>
 							<Text style={styles.scoreValue}>Score: {score.value} {score.valueDescription}</Text>
