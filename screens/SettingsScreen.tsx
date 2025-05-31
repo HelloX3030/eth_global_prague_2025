@@ -1,10 +1,16 @@
+import { StyleSheet, Text, SafeAreaView, ActivityIndicator } from 'react-native';
+
 const SettingsScreen = () => {
   return (
-	<div>
-	  <h1>Settings</h1>
-	  <p>This is the settings screen.</p>
-	</div>
+	<SafeAreaView style={styles.container}>
+	  <Text style={styles.title}>Settings</Text>
+	</SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24 },
+});
 
 export default SettingsScreen;

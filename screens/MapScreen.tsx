@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, SafeAreaView, ActivityIndicator } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import { NavigationContainer } from '@react-navigation/native';
 
 type LocationCoords = {
   latitude: number;
