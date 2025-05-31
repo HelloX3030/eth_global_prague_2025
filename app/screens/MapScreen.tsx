@@ -31,7 +31,7 @@ const MapScreen = () => {
 
   const [location, setLocation] = useState<LocationCoords | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-   const [focusedLocation, setFocusedLocation] = useState<LocationCoords | null>(null);
+  const [focusedLocation, setFocusedLocation] = useState<LocationCoords | null>(null);
 
   interface MapScreenRouteParams {
     latitude: number;
@@ -299,6 +299,14 @@ const MapScreen = () => {
           </View>
         </View>
       </Modal>
+      <TouchableOpacity
+        style={{ position: 'absolute', bottom: 20, right: 20, padding: 10, backgroundColor: 'blue', borderRadius: 50, alignItems: 'center', justifyContent: 'center' }}
+        onPress={() => {
+            location && setFocusedLocation(location);
+        }}
+      >
+        <Text style={{ color: 'white' }}>Focus Location</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
