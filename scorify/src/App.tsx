@@ -14,6 +14,29 @@ L.Icon.Default.mergeOptions({
 	shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
 })
 
+// Helper: Calculate distance between two lat/lng points in meters
+function getDistanceFromLatLonInMeters(
+	lat1: number,
+	lon1: number,
+	lat2: number,
+	lon2: number
+): number {
+	const R = 6371000 // Earth radius in meters
+	const dLat = ((lat2 - lat1) * Math.PI) / 180
+	const dLon = ((lon2 - lon1) * Math.PI) / 180
+	const a =
+		Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.cos((lat1 * Math.PI) / 180) *
+		Math.cos((lat2 * Math.PI) / 180) *
+		Math.sin(dLon / 2) *
+		Math.sin(dLon / 2)
+	const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+	return R * c
+}
+
+// Replace with your recipient Flow address (hex, no 0x prefix)
+const RECIPIENT_ADDRESS = "f8d6e0586b0a20c7" // Example emulator address
+
 function App() {
 	const [user, setUser] = useState<any>(null)
 	const [position, setPosition] = useState<[number, number] | null>(null)
@@ -43,6 +66,70 @@ function App() {
 
 	const logIn = () => fcl.authenticate()
 	const logOut = () => fcl.unauthenticate()
+
+	// Check if user is within 100 meters of challenge
+	const isUserNear = (challengePos: [number, number]) => {
+		if (!position) return false
+		const distance = getDistanceFromLatLonInMeters(
+			position[0],
+			position[1],
+			challengePos[0],
+			challengePos[1]
+		)
+		return distance <= 100
+	}
+
+	// Flow token transfer transaction via FCL
+	const transferFlowTokens = async (recipient: string, amount: string) => {
+		try {
+			const transactionId = await fcl
+				.send([
+					fcl.transaction`
+            import FungibleToken from 0xf233dcee88fe0abe
+            import FlowToken from 0xf233dcee88fe0abe
+
+            transaction(recipient: Address, amount: UFix64) {
+              let senderVault: &FlowToken.Vault
+
+              prepare(signer: AuthAccount) {
+                self.senderVault = signer.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)
+                  ?? panic("Could not borrow reference to the sender's Vault")
+              }
+
+              execute {
+                let recipient = getAccount(recipient)
+                let receiver = recipient.getCapability(/public/flowTokenReceiver)
+                  .borrow<&{FungibleToken.Receiver}>()
+                  ?? panic("Could not borrow receiver reference to the recipient's Vault")
+                self.senderVault.withdraw(amount: amount)
+                  |> receiver.deposit(from: <- self.senderVault.withdraw(amount: amount))
+              }
+            }
+          `,
+					fcl.args([fcl.arg(recipient, fcl.t.Address), fcl.arg(amount, fcl.t.UFix64)]),
+					fcl.proposer(fcl.authz),
+					fcl.payer(fcl.authz),
+					fcl.authorizations([fcl.authz]),
+					fcl.limit(100),
+				])
+				.then(fcl.decode)
+
+			alert(`Payment successful! Transaction ID: ${transactionId}`)
+		} catch (error: any) {
+			console.error("Payment failed:", error)
+			alert(`Payment failed: ${error.message || error}`)
+		}
+	}
+
+	const handlePay = async (cost: number) => {
+		if (!user?.addr) {
+			alert("Please connect your wallet first.")
+			return
+		}
+		// Format cost as UFix64 string with 8 decimals
+		const amount = cost.toFixed(8)
+		await transferFlowTokens(RECIPIENT_ADDRESS, amount)
+	}
 
 	return (
 		<div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -131,27 +218,38 @@ function App() {
 						)}
 
 						{/* Challenge markers */}
-						{scoreEntries.map((entry, index) => (
-							<Marker key={index} position={entry.worldPosition}>
-								<Popup>
-									<div>
-										<strong>{entry.name}</strong>
-										<br />
-										Score: {entry.score}
-										<br />
-										Time: {entry.time.toLocaleString()}
-										<br />
-										Price: ${entry.price}
-										{entry.cost !== undefined && entry.cost > 0 && (
-											<>
-												<br />
-												Cost: ${entry.cost}
-											</>
-										)}
-									</div>
-								</Popup>
-							</Marker>
-						))}
+						{scoreEntries.map((entry, index) => {
+							const near = isUserNear(entry.worldPosition)
+							return (
+								<Marker key={index} position={entry.worldPosition}>
+									<Popup>
+										<div>
+											<strong>{entry.name}</strong>
+											<br />
+											Score: {entry.score}
+											<br />
+											Time: {entry.time.toLocaleString()}
+											<br />
+											Price: ${entry.price}
+											{entry.cost !== undefined && entry.cost > 0 && (
+												<>
+													<br />
+													Cost: ${entry.cost}
+													<br />
+													{near ? (
+														<button onClick={() => handlePay(entry.cost!)}>
+															Pay Cost
+														</button>
+													) : (
+														<small>Get closer to pay</small>
+													)}
+												</>
+											)}
+										</div>
+									</Popup>
+								</Marker>
+							)
+						})}
 					</MapContainer>
 				)}
 			</div>
