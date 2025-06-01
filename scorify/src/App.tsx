@@ -3,6 +3,7 @@ import * as fcl from "@onflow/fcl"
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
+import { scoreEntries } from "./ScoreEntry" // Adjust path as needed
 
 // Fix Leaflet icon issues in React environment
 delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -128,6 +129,29 @@ function App() {
 								<Popup>Your current position</Popup>
 							</Marker>
 						)}
+
+						{/* Challenge markers */}
+						{scoreEntries.map((entry, index) => (
+							<Marker key={index} position={entry.worldPosition}>
+								<Popup>
+									<div>
+										<strong>{entry.name}</strong>
+										<br />
+										Score: {entry.score}
+										<br />
+										Time: {entry.time.toLocaleString()}
+										<br />
+										Price: ${entry.price}
+										{entry.cost !== undefined && entry.cost > 0 && (
+											<>
+												<br />
+												Cost: ${entry.cost}
+											</>
+										)}
+									</div>
+								</Popup>
+							</Marker>
+						))}
 					</MapContainer>
 				)}
 			</div>
