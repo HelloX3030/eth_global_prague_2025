@@ -13,27 +13,27 @@ function App() {
 	const logOut = () => fcl.unauthenticate()
 
 	return (
-		<div className="min-h-screen bg-gray-900 text-white relative">
-			<h1 className="text-3xl font-bold mb-6">Scorify</h1>
-			{user?.addr ? (
-				<div className="flex flex-col items-center gap-4">
-					<p>✅ Connected as:</p>
-					<code className="bg-gray-800 px-4 py-2 rounded">{user.addr}</code>
+		<div>
+			<div>
+				<h1>Scorify</h1>
+
+				{user?.addr ? (
+					<div>
+						<p>✅ Connected as:</p>
+						<code>{user.addr}</code>
+						<button
+							onClick={logOut}
+						>
+							Disconnect
+						</button>
+					</div>
+				) : (
 					<button
-						onClick={logOut}
-						className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-					>
-						Disconnect
+						onClick={logIn}>
+						Connect Wallet
 					</button>
-				</div>
-			) : (
-				<button
-					onClick={logIn}
-					className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-				>
-					Connect Wallet
-				</button>
-			)}
+				)}
+			</div>
 		</div>
 	)
 }
